@@ -448,6 +448,7 @@ class MultiGzipFile(GzipFile):
                 self.pool.join()
             elif self.mode == READ:
                 self._buffer.close()
+                self.raw.close()
         finally:
             self.fileobj = None
             myfileobj = self.myfileobj
@@ -478,6 +479,10 @@ class _MulitGzipReader(_GzipReader):
         self._is_eof = False
         self._raw_fp = fp
         self.block_start_iter = None
+
+    def close(self):
+        self._pool.close()
+        self._pool.join()
 
     def _decompress_func(self, data, rcrc, rsize):
         """
